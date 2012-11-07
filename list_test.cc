@@ -1,5 +1,6 @@
 #include <list>
 #include <gtest/gtest.h>
+#include "my_allocator.hh"
 
 namespace {
   struct A {
@@ -13,6 +14,116 @@ namespace {
     explicit B(int x) : i(x) {}
     bool operator==(const B &x) const { return i == x.i; }
   };
+}
+
+TEST(ListTest, ctor_1a) {
+  std::list<int> list;
+
+  ASSERT_TRUE(list.empty());
+  ASSERT_EQ(static_cast<size_t>(0), list.size());
+}
+
+TEST(ListTest, ctor_1b) {
+  MyAllocator<int> a;
+
+  std::list<int, MyAllocator<int> > list(a);
+
+  ASSERT_TRUE(list.empty());
+  ASSERT_EQ(static_cast<size_t>(0), list.size());
+}
+
+TEST(ListTest, ctor_2a) {
+  std::list<int> list(3, 1);
+
+  ASSERT_FALSE(list.empty());
+  ASSERT_EQ(static_cast<size_t>(3), list.size());
+  for (std::list<int>::iterator it = list.begin(); it != list.end(); ++it) {
+    ASSERT_EQ(1, *it);
+  }
+}
+
+TEST(ListTest, ctor_2b) {
+  MyAllocator<int> a;
+
+  std::list<int, MyAllocator<int> > list(3, 1, a);
+
+  ASSERT_FALSE(list.empty());
+  ASSERT_EQ(static_cast<size_t>(3), list.size());
+  for (std::list<int>::iterator it = list.begin(); it != list.end(); ++it) {
+    ASSERT_EQ(1, *it);
+  }
+}
+
+TEST(ListTest, ctor_3a) {
+  std::list<int> list1;
+  std::list<int>::iterator it;
+
+  list1.push_back(1);
+  list1.push_back(2);
+  list1.push_back(3);
+  list1.push_back(4);
+  list1.push_back(5);
+
+  std::list<int> list2(++list1.begin(), --list1.end());
+
+  ASSERT_FALSE(list2.empty());
+  ASSERT_EQ(static_cast<size_t>(3), list2.size());
+  it = list2.begin();
+  ASSERT_EQ(2, *it++);
+  ASSERT_EQ(3, *it++);
+  ASSERT_EQ(4, *it++);
+}
+
+TEST(ListTest, ctor_3b) {
+  MyAllocator<int> a;
+  std::list<int> list1;
+  std::list<int>::iterator it;
+
+  list1.push_back(1);
+  list1.push_back(2);
+  list1.push_back(3);
+  list1.push_back(4);
+  list1.push_back(5);
+
+  std::list<int, MyAllocator<int> > list2(++list1.begin(), --list1.end());
+
+  ASSERT_FALSE(list2.empty());
+  ASSERT_EQ(static_cast<size_t>(3), list2.size());
+  it = list2.begin();
+  ASSERT_EQ(2, *it++);
+  ASSERT_EQ(3, *it++);
+  ASSERT_EQ(4, *it++);
+}
+
+TEST(ListTest, ctor_4) {
+  std::list<int> list1;
+  std::list<int>::iterator it;
+
+  list1.push_back(1);
+  list1.push_back(2);
+  list1.push_back(3);
+
+  std::list<int> list2(list1);
+  
+  ASSERT_FALSE(list2.empty());
+  ASSERT_EQ(static_cast<size_t>(3), list2.size());
+  it = list2.begin();
+  ASSERT_EQ(1, *it++);
+  ASSERT_EQ(2, *it++);
+  ASSERT_EQ(3, *it++);
+}
+
+TEST(ListTest, ctor_5) {
+  std::list<int>::iterator it;
+
+  std::list<int> list(3);
+
+  ASSERT_FALSE(list.empty());
+  ASSERT_EQ(static_cast<size_t>(3), list.size());
+  it = list.begin();
+  ASSERT_EQ(0, *it++);
+  ASSERT_EQ(0, *it++);
+  ASSERT_EQ(0, *it++);
 }
 
 TEST(ListTest, assign_1) {
