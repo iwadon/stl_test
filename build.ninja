@@ -1,0 +1,31 @@
+builddir = build
+gtestdir = gtest-1.6.0
+cxx = g++
+cxxflags = -Wall -Wextra -O2 -g -pipe
+cppflags = -I$gtestdir/include
+ar = ar
+ld = $cxx
+ldflags =
+libs =
+
+rule cxx
+  command = $cxx -MMD -MT $out -MF $out.d $cxxflags $cppflags -c $in -o $out
+  description = CXX $out
+  depfile = $out.d
+
+rule ar
+  command = rm -f $out && $ar crs $out $in
+  description = AR $out
+
+rule link
+  command = $cxx $ldflags -o $out $in $libs
+  description = LINK $out
+
+build $builddir/gtest-all.o: cxx $gtestdir/src/gtest-all.cc
+  cppflags = -I$gtestdir $cppflags
+build $builddir/gtest_main.o: cxx $gtestdir/src/gtest_main.cc
+build $builddir/libgtest.a: ar $builddir/gtest-all.o $builddir/gtest_main.o
+
+build $builddir/list_test.o: cxx list_test.cc
+build stl_test: link $builddir/list_test.o $
+                     $builddir/libgtest.a
