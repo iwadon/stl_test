@@ -1,5 +1,5 @@
 builddir = build
-gtestdir = gtest-1.6.0
+gtestdir = googletest/googletest
 cxx = g++
 cxxflags = -Wall -Wextra -O2 -g -pipe
 cppflags = -I$gtestdir/include
