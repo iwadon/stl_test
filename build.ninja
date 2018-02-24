@@ -27,5 +27,7 @@ build $builddir/gtest_main.o: cxx $gtestdir/src/gtest_main.cc
 build $builddir/libgtest.a: ar $builddir/gtest-all.o $builddir/gtest_main.o
 
 build $builddir/list_test.o: cxx list_test.cc
+build $builddir/string_test.o: cxx string_test.cc
 build stl_test: link $builddir/list_test.o $
+                     $builddir/string_test.o $
                      $builddir/libgtest.a
